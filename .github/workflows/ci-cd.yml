@@ -1,0 +1,29 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build container image
+        run: podman build -t url-shortener:latest .
+
+      - name: Deploy container
+        run: |
+          podman rm -f url-shortener || true
+
+          podman run -d \
+            --name url-shortener \
+            -p 8080:5000 \
+            url-shortener:latest
+
+      - name: Verify deployment
+        run: curl --fail http://localhost:8080/health
