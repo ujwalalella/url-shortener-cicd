@@ -22,8 +22,8 @@ jobs:
 
           podman run -d \
             --name url-shortener \
-            -p 8080:5000 \
+            --network host \
             url-shortener:latest
 
       - name: Verify deployment
-        run: curl --fail http://localhost:8080/health
+        run: curl --fail http://localhost:5000/health
