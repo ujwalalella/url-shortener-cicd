@@ -18,13 +18,9 @@ jobs:
           python3 -m venv .venv
           .venv/bin/pip install -r requirements.txt
 
-      - name: Stop existing application
+      - name: Restart application
         run: |
-          pkill -f "python.*app.py" || true
-
-      - name: Start application
-        run: |
-          nohup .venv/bin/python app.py > app.log 2>&1 &
+          sudo systemctl restart url-shortener
 
       - name: Verify deployment
         run: |
