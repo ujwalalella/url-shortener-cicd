@@ -13,17 +13,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build container image
-        run: podman build -t url-shortener:latest .
-
-      - name: Deploy container
+      - name: Set up Python environment
         run: |
-          podman rm -f url-shortener || true
+          python3 -m venv .venv
+          .venv/bin/pip install -r requirements.txt
 
-          podman run -d \
-            --name url-shortener \
-            --network host \
-            url-shortener:latest
+      - name: Stop existing application
+        run: |
+          pkill -f "python.*app.py" || true
+
+      - name: Start application
+        run: |
+          nohup .venv/bin/python app.py > app.log 2>&1 &
 
       - name: Verify deployment
-        run: curl --fail http://localhost:5000/health
+        run: |
+          sleep 3
+          curl --fail http://localhost:5000/health
